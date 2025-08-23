@@ -1,0 +1,20 @@
+{
+  "name": "devtinder_backend",
+  "version": "1.0.0",
+  "description": "tinder for devs",
+  "keywords": [
+    "nodejs",
+    "expressjs"
+  ],
+  "license": "ISC",
+  "author": "Kiran Muttanwar",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "dev":"nodemon src/app.js",
+    "start":"node start"
+  },
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}
