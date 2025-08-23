@@ -2,35 +2,37 @@ const express = require("express");
 
 const app = express();
 
-app.get("/", (req, res) => {
-  res.send({ firstName: "Akshay", lastName: "Kumar" });
-});
-//this will only handle only GET API call to  /user
-app.get("/user", (req, res) => {
-  console.log(req.query);
-  res.send({ firstName: "Akshay", lastName: "Saini" });
-});
-app.get("/user/:userId/:role/:name", (req, res) => {
-  console.log(req.params);
-  res.send({ firstName: "Akshay" });
-});
+app.use(
+  "/user",
+  [
+    (req, res, next) => {
+      console.log("executed first handler");
 
-app.get("/user", (req, res) => {
-  console.log(req.params);
-});
-app.post("/user", (req, res) => {
-  //saving data to DB
-  res.send("Data Saved Successfully");
-});
-app.delete("/user", (req, res) => {
-  //deleteing data from DB
-  res.send("Data Deleted Successfully");
-});
-
-//this will match all the HTTP method API calls to /test
-app.use("/test", (req, res) => {
-  res.send("testing you");
-});
+      next();
+      // res.send("Respose from handler 1");
+    },
+    (req, res, next) => {
+      console.log("executed second handler");
+      // res.send("Respose from handler 2");
+      next();
+    },
+    (req, res, next) => {
+      console.log("executed third handler");
+      // res.send("Respose from handler 3");
+      next();
+    },
+    (req, res, next) => {
+      console.log("executed fourth handler");
+      //   res.send("Respose from handler 4");
+      next();
+    },
+  ],
+  (req, res, next) => {
+    console.log("executed fifth handler");
+    res.send("Respose from handler 5");
+    // next();
+  }
+);
 
 app.listen(7777, () => {
   console.log("server running on 7777");
