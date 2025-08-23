@@ -7,9 +7,17 @@ app.get("/", (req, res) => {
 });
 //this will only handle only GET API call to  /user
 app.get("/user", (req, res) => {
+  console.log(req.query);
   res.send({ firstName: "Akshay", lastName: "Saini" });
 });
+app.get("/user/:userId/:role/:name", (req, res) => {
+  console.log(req.params);
+  res.send({ firstName: "Akshay" });
+});
 
+app.get("/user", (req, res) => {
+  console.log(req.params);
+});
 app.post("/user", (req, res) => {
   //saving data to DB
   res.send("Data Saved Successfully");
