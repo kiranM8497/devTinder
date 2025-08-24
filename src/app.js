@@ -1,23 +1,27 @@
 const express = require("express");
 const { adminAuth, userAuth } = require("./middlewares/auth");
-
+const { connectDb } = require("./config/database");
+const User = require("./models/user");
 const app = express();
-//if wrriten anywhere bur last it will not work
-// app.use("/", (err, req, res, next) => {
-//   if (err) {
-//     res.status(500).send("Something went wrong!!");
-//   }
-// });
-app.get("/user/getAllData", (req, res, next) => {
-  throw new Error("xyz");
-});
 
-//error handling middleware shuold always be last
-app.use("/", (err, req, res, next) => {
-  if (err) {
-    res.status(500).send("Something went wrong!!");
-  }
+app.post("/signup", async (req, res) => {
+  console.log(User);
+  //creatign a new instacne of a user model
+  const user = new User({
+    firstName: "Virat",
+    lastName: "Kohli",
+    emailId: "king@google.com",
+    password: "king@123",
+  });
+
+  await user.save();
+  res.send("User added Successfully");
 });
-app.listen(7777, () => {
-  console.log("server running on 7777");
-});
+connectDb()
+  .then(() => {
+    console.log("database connection successfull");
+    app.listen(7777, () => {
+      console.log("server running on 7777");
+    });
+  })
+  .catch((err) => console.log("databse connection failed"));
