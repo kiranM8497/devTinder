@@ -2,33 +2,22 @@ const express = require("express");
 const { adminAuth, userAuth } = require("./middlewares/auth");
 
 const app = express();
-// -- with app.use() it matches with all req starting with prefix provided
-//-- Doesn’t care about exact path — /test will also match /test/abc
-
-// app.use("/admin", adminAuth);
-
-//  #######
-
-// with app.all() it will match exactly provided path (no prefix matching)
-//test → matched (for any method: GET, POST, DELETE, etc.)
-//test/123 → not matched
-//testing → not matched
-// app.all("/admin", adminAuth);
-
-app.get("/user", userAuth, (req, res, next) => {
-  res.send("User Data");
-});
-app.post("/user/login", (req, res, next) => {
-  res.send("logged in");
+//if wrriten anywhere bur last it will not work
+// app.use("/", (err, req, res, next) => {
+//   if (err) {
+//     res.status(500).send("Something went wrong!!");
+//   }
+// });
+app.get("/user/getAllData", (req, res, next) => {
+  throw new Error("xyz");
 });
 
-app.get("/admin/getAllData", (req, res, next) => {
-  res.send("sending all Data");
+//error handling middleware shuold always be last
+app.use("/", (err, req, res, next) => {
+  if (err) {
+    res.status(500).send("Something went wrong!!");
+  }
 });
-app.delete("/admin/deleteUserData", (req, res, next) => {
-  res.send("deleted user");
-});
-
 app.listen(7777, () => {
   console.log("server running on 7777");
 });
