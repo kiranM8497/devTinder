@@ -2,12 +2,20 @@ const express = require("express");
 const { adminAuth, userAuth } = require("./middlewares/auth");
 const { connectDb } = require("./config/database");
 const User = require("./models/user");
+
+const validator = require("validator");
 const app = express();
 app.use(express.json());
 app.post("/signup", async (req, res) => {
   try {
-    console.log(req.body);
+    // console.log(req.body);
     const data = req.body;
+
+    if (data?.skills.length > 10) {
+      throw new Error(
+        "some of the things you are trying to update are not allowed!!"
+      );
+    }
     //creatign a new instacne of a user model
     const user = new User(data);
 
@@ -59,13 +67,26 @@ app.delete("/user", async (req, res) => {
   }
 });
 
-app.patch("/user", async (req, res) => {
+app.patch("/user/:id", async (req, res) => {
   try {
-    const { id } = req.body;
+    const id = req.params?.id;
     console.log(req.body);
-    const updates = req.body;
+    const data = req.body;
+    const ALLOWED_UPDATES = ["about", "gender", "photoUrl", "age", "skills"];
 
-    const result = await User.findByIdAndUpdate(id, updates, {
+    const isUpdateAllowed = Object.keys(data).every((key) =>
+      ALLOWED_UPDATES.includes(key)
+    );
+    if (!isUpdateAllowed) {
+      throw new Error(
+        "some of the things you are trying to update are not allowed!!"
+      );
+    }
+
+    if (data.skills.length > 10) {
+      throw new Error("maximum 10 skills are allowed");
+    }
+    const result = await User.findByIdAndUpdate(id, data, {
       returnDocument: "after",
       runValidators: true,
     });
@@ -77,7 +98,7 @@ app.patch("/user", async (req, res) => {
     res.send("user updated successfully!!");
   } catch (error) {
     console.log(error);
-    res.send(error.message);
+    res.send("UPDATE FAILED: " + error.message);
   }
 });
 //get all the users from DB

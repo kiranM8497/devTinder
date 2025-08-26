@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const validator = require("validator");
 
 const userSchema = mongoose.Schema(
   {
@@ -19,12 +20,23 @@ const userSchema = mongoose.Schema(
       unique: true,
       lowercase: true,
       trim: true,
+      validate(value) {
+        console.log(validator.isEmail(value));
+        if (!validator.isEmail(value)) {
+          throw new Error("Invalid Email Address!!");
+        }
+      },
     },
     password: {
       type: String,
       required: true,
       minLength: 8,
       maxLength: 16,
+      validate(value) {
+        if (!validator.isStrongPassword(value)) {
+          throw new Error("please provide a strong password!!");
+        }
+      },
     },
     age: {
       type: Number,
@@ -42,6 +54,11 @@ const userSchema = mongoose.Schema(
       type: String,
       default:
         "https://static.vecteezy.com/system/resources/thumbnails/035/857/753/small/people-face-avatar-icon-cartoon-character-png.png",
+      validate(value) {
+        if (!validator.isURL(value)) {
+          throw new Error("URL provided is invalid!!");
+        }
+      },
     },
     about: {
       type: String,
