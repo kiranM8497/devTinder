@@ -16,7 +16,7 @@ app.post("/signup", async (req, res) => {
         "some of the things you are trying to update are not allowed!!"
       );
     }
-    //creatign a new instacne of a user model
+    //creating a new instance of a user model
     const user = new User(data);
 
     await user.save();
