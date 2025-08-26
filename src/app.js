@@ -15,6 +15,7 @@ app.post("/signup", async (req, res) => {
     res.send("User added Successfully");
   } catch (error) {
     console.log(error);
+    res.send(error.message);
   }
 });
 
@@ -60,10 +61,13 @@ app.delete("/user", async (req, res) => {
 
 app.patch("/user", async (req, res) => {
   try {
-    const { id, emailId } = req.body;
+    const { id } = req.body;
+    console.log(req.body);
+    const updates = req.body;
 
-    const result = await User.findByIdAndUpdate(id, {
-      $set: { emailId: emailId },
+    const result = await User.findByIdAndUpdate(id, updates, {
+      returnDocument: "after",
+      runValidators: true,
     });
     // const result = await User.findByIdAndDelete({ _id: id });
     // const result = await User.deleteOne({ _id: id });
@@ -73,7 +77,7 @@ app.patch("/user", async (req, res) => {
     res.send("user updated successfully!!");
   } catch (error) {
     console.log(error);
-    res.status(500).send("something went wrong");
+    res.send(error.message);
   }
 });
 //get all the users from DB
