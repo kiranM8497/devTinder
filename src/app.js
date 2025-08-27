@@ -1,13 +1,15 @@
 const express = require("express");
-const { adminAuth, userAuth } = require("./middlewares/auth");
+const { userAuth } = require("./middlewares/auth");
 const { connectDb } = require("./config/database");
 const User = require("./models/user");
-
+const cookieParser = require("cookie-parser");
 const validator = require("validator");
 const validateSignupData = require("./utils/validation");
 const bcrypt = require("bcrypt");
+var jwt = require("jsonwebtoken");
 const app = express();
 app.use(express.json());
+app.use(cookieParser());
 app.post("/signup", async (req, res) => {
   try {
     //validate the data(via helper functions)
@@ -55,8 +57,15 @@ app.post("/login", async (req, res) => {
     const isPasswordValid = bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       res.status(401).send("Invalid email or password");
+    } else {
+      //craete a JWT token
+      const token = jwt.sign({ _id: user._id }, "DEV@KIRAN$$");
+      console.log(token);
+
+      //add the token  to cookie  and send  the resposne bak to the user
+      res.cookie("access_token", token);
+      res.send("User Login Successfull..!");
     }
-    res.send("User Login Successfull..!");
   } catch (error) {
     console.log(error);
     res.send(error.message);
@@ -82,6 +91,35 @@ app.get("/user", async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(500).send("something went wrong");
+  }
+});
+
+app.get("/profile", userAuth, async (req, res) => {
+  try {
+    const cookies = req.cookies;
+    // console.log(cookies);
+    //extract cookie
+    const { access_token } = cookies;
+    if (!access_token) {
+      throw new Error("Invalid Token");
+    }
+    //validate token
+    const decoded = jwt.verify(access_token, "DEV@KIRAN$$");
+    // console.log(decoded);
+    const { _id } = decoded;
+
+    const user = await User.findById(_id);
+
+    if (!user) {
+      throw new Error("Authentication failed");
+    }
+
+    console.log("logged in user is: " + user.firstName);
+
+    res.status(200).send(user);
+  } catch (error) {
+    console.log(error.message);
+    res.status(400).send(error.message);
   }
 });
 
