@@ -63,7 +63,9 @@ app.post("/login", async (req, res) => {
       console.log(token);
 
       //add the token  to cookie  and send  the resposne bak to the user
-      res.cookie("access_token", token);
+      res.cookie("access_token", token, {
+        expires: new Date(Date.now() + 8 * 3600000), // cookie will be removed after 8 hours
+      });
       res.send("User Login Successfull..!");
     }
   } catch (error) {
@@ -72,48 +74,9 @@ app.post("/login", async (req, res) => {
   }
 });
 
-app.get("/user", async (req, res) => {
-  try {
-    const { emailId } = req.body;
-
-    const user = await User.findOne({ emailId: emailId });
-    if (!user) {
-      res.status(404).send("User Not Found");
-    } else {
-      res.send(user);
-    }
-    // const users = await User.find({ emailId: emailId });
-
-    // if (users.length === 0) {
-    //   res.status(404).send("User Not Found");
-    // }
-    // res.send(users);
-  } catch (error) {
-    console.log(error);
-    res.status(500).send("something went wrong");
-  }
-});
-
 app.get("/profile", userAuth, async (req, res) => {
   try {
-    const cookies = req.cookies;
-    // console.log(cookies);
-    //extract cookie
-    const { access_token } = cookies;
-    if (!access_token) {
-      throw new Error("Invalid Token");
-    }
-    //validate token
-    const decoded = jwt.verify(access_token, "DEV@KIRAN$$");
-    // console.log(decoded);
-    const { _id } = decoded;
-
-    const user = await User.findById(_id);
-
-    if (!user) {
-      throw new Error("Authentication failed");
-    }
-
+    const user = req.user;
     console.log("logged in user is: " + user.firstName);
 
     res.status(200).send(user);
@@ -123,67 +86,11 @@ app.get("/profile", userAuth, async (req, res) => {
   }
 });
 
-//delete a user from DB
-app.delete("/user", async (req, res) => {
-  try {
-    const { id } = req.body;
+app.post("/sendConnectionRequest", userAuth, (req, res, next) => {
+  const user = req.user;
+  //sending connection request
 
-    const result = await User.findByIdAndDelete(id);
-    // const result = await User.findByIdAndDelete({ _id: id });
-    // const result = await User.deleteOne({ _id: id });
-    // User.deleteOne({ _id: id }).exec();
-
-    // console.log(result);
-    res.send("user deleted successfully!!");
-  } catch (error) {
-    console.log(error);
-    res.status(500).send("something went wrong");
-  }
-});
-
-app.patch("/user/:id", async (req, res) => {
-  try {
-    const id = req.params?.id;
-    console.log(req.body);
-    const data = req.body;
-    const ALLOWED_UPDATES = ["about", "gender", "photoUrl", "age", "skills"];
-
-    const isUpdateAllowed = Object.keys(data).every((key) =>
-      ALLOWED_UPDATES.includes(key)
-    );
-    if (!isUpdateAllowed) {
-      throw new Error(
-        "some of the things you are trying to update are not allowed!!"
-      );
-    }
-
-    if (data.skills.length > 10) {
-      throw new Error("maximum 10 skills are allowed");
-    }
-    const result = await User.findByIdAndUpdate(id, data, {
-      returnDocument: "after",
-      runValidators: true,
-    });
-    // const result = await User.findByIdAndDelete({ _id: id });
-    // const result = await User.deleteOne({ _id: id });
-    // User.deleteOne({ _id: id }).exec();
-
-    // console.log(result);
-    res.send("user updated successfully!!");
-  } catch (error) {
-    console.log(error);
-    res.send("UPDATE FAILED: " + error.message);
-  }
-});
-//get all the users from DB
-app.get("/feed", async (req, res) => {
-  try {
-    const users = await User.find({});
-    res.send(users);
-  } catch (error) {
-    console.log(error);
-    res.status(500).send("something went wrong");
-  }
+  res.send(user.firstName + " sent request  connection ");
 });
 connectDb()
   .then(() => {
