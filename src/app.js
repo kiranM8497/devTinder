@@ -54,14 +54,12 @@ app.post("/login", async (req, res) => {
     if (!user) {
       throw new Error("Invalid email or password");
     }
-    const isPasswordValid = bcrypt.compare(password, user.password);
+    const isPasswordValid = user.verifyPassword(password);
     if (!isPasswordValid) {
       res.status(401).send("Invalid email or password");
     } else {
-      //craete a JWT token
-      const token = jwt.sign({ _id: user._id }, "DEV@KIRAN$$");
-      console.log(token);
-
+      //get JWT token from helper function form  user schema
+      const token = await user.getJWT();
       //add the token  to cookie  and send  the resposne bak to the user
       res.cookie("access_token", token, {
         expires: new Date(Date.now() + 8 * 3600000), // cookie will be removed after 8 hours
