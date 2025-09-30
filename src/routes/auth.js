@@ -37,7 +37,7 @@ authRouter.post("/signup", async (req, res) => {
 authRouter.post("/login", async (req, res) => {
   try {
     //extract the values
-
+    console.log("here");
     const { emailId, password } = req.body;
     // if (!validator.isEmail(emailId)) {
     //   throw new Error("invalid emailId");

@@ -86,7 +86,7 @@ userSchema.methods.getJWT = async function () {
   const token = jwt.sign({ _id: user._id }, "DEV@KIRAN$$", {
     expiresIn: "7d",
   });
-  console.log("typeof toke is ", typeof token);
+  // console.log("typeof toke is ", typeof token);
   return token;
 };
 

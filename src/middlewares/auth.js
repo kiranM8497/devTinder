@@ -9,9 +9,7 @@ const userAuth = async (req, res, next) => {
       throw new Error("Invalid Token");
     }
     //validate token
-    const decoded = jwt.verify(access_token, "DEV@KIRAN$$", {
-      expiresIn: "1h",
-    });
+    const decoded = jwt.verify(access_token, "DEV@KIRAN$$");
     const { _id } = decoded;
     //find the user
     const user = await User.findById(_id);

@@ -67,7 +67,7 @@ profileRouter.patch("/profile/password", userAuth, async (req, res) => {
     }
     //if is correct chcek the new password is it strong password
     if (!validator.isStrongPassword(newPassword)) {
-      throw new Error("Please Choose a String Password...!");
+      throw new Error("Please Choose a Strong Password...!");
     }
     //encrypt the password
     const newHash = await bcrypt.hash(newPassword, 10);
