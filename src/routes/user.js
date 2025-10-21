@@ -50,4 +50,36 @@ userRouter.get("/user/connections", userAuth, async (req, res) => {
     });
   }
 });
+userRouter.get("/feed", userAuth, async (req, res) => {
+  try {
+    //user should seeall the other user cards but
+    //user should not see
+    //0. his own card
+    //1.his connections
+    //2.ignored people
+    //3.allready sent the connection request
+
+    const loggedInUser = req.user;
+    // console.log(loggedInUser);
+    const connectionRequests = await ConnectionRequest.find({
+      $or: [{ toUserId: loggedInUser._id }, { fromUserId: loggedInUser._id }],
+    }).select("fromUserId toUserId");
+    // .populate("fromUserId", "firstName")
+    // .populate("toUserId", "firstName");
+
+    const hideUsersFromFeed = new Set();
+
+    connectionRequests.forEach((req) => {
+      hideUsersFromFeed.add(req.toUserId.toString());
+      hideUsersFromFeed.add(req.fromUserId.toString());
+    });
+    console.log(hideUsersFromFeed);
+
+    res.send(hideUsersFromFeed);
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+    });
+  }
+});
 module.exports = userRouter;
