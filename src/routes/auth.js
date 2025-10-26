@@ -37,7 +37,7 @@ authRouter.post("/signup", async (req, res) => {
 authRouter.post("/login", async (req, res) => {
   try {
     //extract the values
-    console.log("here");
+
     const { emailId, password } = req.body;
     // if (!validator.isEmail(emailId)) {
     //   throw new Error("invalid emailId");
@@ -57,7 +57,7 @@ authRouter.post("/login", async (req, res) => {
       res.cookie("access_token", token, {
         expires: new Date(Date.now() + 8 * 3600000), // cookie will be removed after 8 hours
       });
-      res.send("User Login Successfull..!");
+      res.send(user);
     }
   } catch (error) {
     console.log(error);
